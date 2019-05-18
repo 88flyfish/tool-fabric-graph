@@ -1,0 +1,411 @@
+.main-container {
+  position: relative;
+  text-align: center;
+}
+.main-container .canvasWrap {
+  display: inline-block;
+  position: relative;
+  height: 430px;
+  padding: 0 15px;
+  margin: 16px auto 5px;
+  box-sizing: border-box;
+}
+.main-container .canvasWrap #canvas {
+  width: 100%;
+  height: 100%;
+}
+.main-container .toolBox {
+  width: auto;
+  margin: 0 auto;
+  height: 70px;
+}
+.main-container .toolBox .toolItem {
+  width: 100px;
+  position: relative;
+  height: 100%;
+  box-sizing: border-box;
+  padding: 5px 0;
+}
+.main-container .toolBox .toolItem input {
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  top: 0;
+  left: 0;
+  position: absolute;
+  z-index: 10;
+  cursor: pointer;
+}
+.main-container .toolBox .toolItem:last-child {
+  height: 60px;
+}
+.main-container .toolBox:hover {
+  cursor: pointer;
+}
+.main-container .toolBox:not(:first-child):not(:last-child):before {
+  position: absolute;
+  right: 0;
+  top: 20px;
+  content: '';
+  width: 1px;
+  height: 30px;
+  background-color: #eee;
+}
+.main-container .toolBox:first-child {
+  margin-right: 15px;
+}
+.main-container .toolBox.pic {
+  width: 65px;
+  height: 35px;
+}
+.main-container .toolBox.txt {
+  margin-top: 3px;
+  text-align: center;
+  font-size: 16px;
+  color: #6a707e;
+}
+.main-container .toolBox :nth-child(2) .pic {
+  width: 63px;
+  height: 35px;
+  background: url('../img/平行四边形.png') center;
+}
+.main-container .toolBox :nth-child(3) .pic {
+  width: 42px;
+  height: 36px;
+  background: url('../img/三角形.png') center;
+}
+.main-container .toolBox :nth-child(4) .pic {
+  width: 57px;
+  height: 35px;
+  background: url('../img/梯形.png') center;
+}
+.main-container .toolBox :nth-child(5) .pic {
+  width: 34px;
+  height: 34px;
+  background: url('../img/圆形.png') center;
+}
+.main-container .toolBox :nth-child(6) .pic {
+  width: 36px;
+  height: 37px;
+  background: url('../img/不规则多边形.png') center;
+}
+.main-container .toolBox :nth-child(7) .pic {
+  width: 36px;
+  height: 36px;
+  background: url('../img/立体图形.png') center;
+}
+.main-container .toolBox .addPic {
+  box-sizing: border-box;
+  width: 100px;
+  height: 100%;
+  line-height: 50px;
+  background: url('../img/add.png') left center no-repeat;
+  margin-right: 5px;
+  padding-left: 20px;
+}
+.main-container .toolItem .flexY {
+  height: 100%;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+}
+.main-container .toolItem .more {
+  /* min-width: 165px; */
+  position: absolute;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-pack: distribute;
+      justify-content: space-around;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+  background-color: #fff;
+  box-shadow: 0px 0px 6px 0px rgba(0, 0, 0, 0.14);
+  border-radius: 4px;
+  -webkit-border-radius: 4px;
+  transform: translateX(-50%) translateX(50px);
+  -webkit-transform: translateX(-50%) translateX(50px);
+}
+.main-container .toolItem .more:before {
+  position: absolute;
+  content: '';
+  top: calc(100% - 8px);
+  width: 0;
+  height: 0;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid #fff;
+  border-right: 5px solid #fff;
+  border-left: 5px solid transparent;
+  -webkit-transform: rotate(45deg);
+          transform: rotate(45deg);
+}
+.main-container .toolItem .more .graphBox {
+  width: calc(50% - 8px);
+  height: 45px;
+  margin: 4px;
+  padding: 2px;
+  box-sizing: border-box;
+  border: 1px solid  transparent;
+}
+.main-container .toolItem .more .graphBox .txt {
+  font-size: 12px;
+  color: #888888;
+  margin-top: 3px;
+}
+.main-container .toolItem .more .graphBox.active {
+  -webkit-border-radius: 2px;
+  border: 1px solid #e6e6e6;
+  border-radius: 3px;
+  background-color: #fafcfe;
+}
+/**
+ * Create the circle checkbox button
+ */
+.toolItem .checkboxCicle {
+  width: 20px;
+  height: 20px;
+  background: #ddd;
+  margin-right: 8px;
+  border-radius: 100%;
+  position: relative;
+  box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.3);
+}
+.checkboxCicle label {
+  display: block;
+  width: 14px;
+  height: 14px;
+  border-radius: 100px;
+  -webkit-transition: all 0.5s ease;
+  transition: all 0.5s ease;
+  cursor: pointer;
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  z-index: 1;
+  background: #333;
+  box-shadow: inset 0px 1px 3px rgba(0, 0, 0, 0.5);
+}
+.checkboxCicle input[type=checkbox]:checked + label {
+  background: #629df8;
+}
+.showFg {
+  font-size: 18px;
+  color: #888888;
+}
+.operationBox {
+  position: absolute;
+}
+.operationBox .wrap {
+  border: 1px solid #dbeaff;
+  border-radius: 3px;
+  -webkit-border-radius: 3px;
+  background-color: #eee;
+}
+.operationBox .wrap > div {
+  width: 32px;
+  height: 32px;
+}
+.operationBox .wrap > div:not(:last-child) {
+  border-bottom: 1px solid #dbeaff;
+}
+.operationBox .wrap .copy {
+  background: url('../img/copy.png') no-repeat center;
+}
+.operationBox .wrap .copy:hover {
+  background: url('../img/copy1.png') #ddd no-repeat center;
+  cursor: pointer;
+}
+.operationBox .wrap .delete {
+  background: url('../img/delete.png') no-repeat center;
+}
+.operationBox .wrap .delete:hover {
+  background: url('../img/delete1.png') #ddd no-repeat center;
+  cursor: pointer;
+}
+.operationBox .wrap .rotate {
+  background: url('../img/rotate.png') no-repeat center;
+}
+.operationBox .wrap .rotate:hover {
+  background: url('../img/rotate1.png') #ddd no-repeat center;
+  cursor: pointer;
+}
+.operationBox .wrap .color {
+  position: relative;
+  background: url('../img/color.png') no-repeat center;
+}
+.operationBox .wrap .color:hover {
+  background: url('../img/color1.png') #ddd no-repeat center;
+  cursor: pointer;
+}
+.operationBox .wrap .color .colorWrap {
+  position: absolute;
+  top: 34px;
+  left: 0;
+  width: 160px;
+  height: 80px;
+  background-color: #ffffff;
+  box-shadow: 0px 0px 6px 0px rgba(0, 0, 0, 0.14);
+  border-radius: 2px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -ms-flex-pack: distribute;
+      justify-content: space-around;
+}
+.operationBox .wrap .color .colorWrap .colorBox .colorItem {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  margin: 0 3px;
+  background-color: #f6b37f;
+  border: solid 1px #d2d2d2;
+}
+.operationBox .wrap .color .colorWrap .colorPicker {
+  width: 122px;
+  line-height: 26px;
+  height: 26px;
+  padding-left: 20px;
+  font-size: 16px;
+  color: #888888;
+  background: url('../img/colorpick.png') no-repeat center;
+}
+.result-main {
+  min-width: 960px;
+}
+.result-main > .top {
+  position: relative;
+  margin: 30px auto 70px;
+}
+.result-main > .top .tabBox {
+  width: 441px;
+  height: 57px;
+  line-height: 57px;
+  margin: 0 auto;
+  border-radius: 10px;
+  -webkit-border-radius: 10px;
+}
+.result-main > .top .tabBox span {
+  display: inline-block;
+  text-align: center;
+  font-size: 24px;
+  background-color: #e8e8e8;
+  color: #5f5f5f;
+  width: 220px;
+  height: 100%;
+}
+.result-main > .top .tabBox span:hover {
+  cursor: pointer;
+}
+.result-main > .top .tabBox span:nth-child(1) {
+  border-radius: 10px 0 0 10px;
+  -webkit-border-radius: 10px 0 0 10px;
+}
+.result-main > .top .tabBox span:nth-child(2) {
+  border-radius: 0 10px 10px 0;
+  -webkit-border-radius: 0 10px 10px 0;
+}
+.result-main > .top .tabBox span.active {
+  background-color: #36adf9;
+  color: #fff;
+}
+.result-main > .top .total {
+  position: absolute;
+  top: 20px;
+  right: 10px;
+  font-size: 18px;
+  color: #888888;
+}
+.result-main > .top .total span {
+  font-size: 36px;
+  color: #888888;
+}
+.result-main > .top .total span.hasDone {
+  color: #21ab0b;
+}
+.result-main .contain {
+  width: 996px;
+  margin: 0 auto;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+  -webkit-box-pack: start;
+      -ms-flex-pack: start;
+          justify-content: flex-start;
+}
+.result-main .contain .isDone {
+  width: 175px;
+  height: 144px;
+  background-color: #e6e6e6;
+  box-shadow: 0px 0px 6px 0px rgba(77, 77, 77, 0.15);
+  border-radius: 16px;
+  margin: 15px;
+}
+.result-main .contain .isDone:nth-child(5n) {
+  margin-right: 0;
+}
+.result-main .contain .isDone:nth-child(5n+1) {
+  margin-left: 0;
+}
+.result-main .contain .isDone .txtBox .top {
+  width: 175px;
+  height: 106px;
+  background-color: #c4e7fe;
+  border-radius: 16px 16px 0px 0px;
+}
+.result-main .contain .isDone .txtBox .bottom {
+  width: 175px;
+  height: 28px;
+  line-height: 28px;
+  background-color: #fff;
+  border-radius: 0px 0px 16px 16px;
+  font-size: 16px;
+  color: #555;
+  text-align: center;
+}
+.result-main .contain .notDone {
+  width: 175px;
+  height: 144px;
+  background-color: #e6e6e6;
+  box-shadow: 0px 0px 6px 0px rgba(77, 77, 77, 0.15);
+  border-radius: 16px;
+  margin: 15px;
+}
+.result-main .contain .notDone:nth-child(5n) {
+  margin-right: 0;
+}
+.result-main .contain .notDone:nth-child(5n+1) {
+  margin-left: 0;
+}
+.result-main .contain .notDone .txtBox {
+  height: 134px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -ms-flex-pack: distribute;
+      justify-content: space-around;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  background-color: #fafafa;
+}
+.result-main .contain .notDone .txtBox .top {
+  font-size: 36px;
+  color: #555555;
+}
+.result-main .contain .notDone .txtBox .bottom {
+  font-size: 16px;
+  color: #888888;
+}

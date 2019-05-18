@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="Description" content="tiny ColorPicker is a small (10.0KB, 4.5KB gZip) but very advanced jQuery color picker and color conversion / calculation tool that supports the following color spaces: rgb, hsv, hsl, hex,  but also  alpha, WCAG 2.0 readability standards (based on opacity levels of all layers), contrast, color similarity, grayscale, 2-layer or 3-layer overlap mix, etc..." />
+    <meta name="Keywords" content="ColorPicker, color picker, color chooser, color, picker, javaScript, jquery, colors, rgb, hsv, hsl, hex, alpha, WCAG 2.0, grayscale, contrast, readability, realtime, retina, high resolution" />
+    <title>图形拼接</title>
+    <link rel="stylesheet" href="./css/base.css">
+    <link rel="stylesheet" href="./css/main.css">
+</head>
+
+<body>
+    <div class="main-container" id="vm" v-cloak>
+        <div class="canvasWrap">
+            <canvas id="canvas"></canvas>
+            <div class='operationBox' v-show='isShowOperation'>
+                <div class="wrap">
+                    <div class="copy flexY" @click.stop="clone"></div>
+                    <div class="delete flexY" @click.stop="deleteObj"></div>
+                    <div class="rotate flexY" @click.stop="rotate"></div>
+                    <div class="color flexY" @click.stop="toggleColorBox" v-if = 'isShowColorPickerTool'>
+                        <div class="colorWrap" v-show='isShowColorPick'>
+                            <div class="colorBox">
+                                <span class='colorItem' @click.stop='fill(item)' v-for='item in colorPickArr' :style='{background:item}'></span>
+                            </div>
+                            <!-- 写了个空方法阻止冒泡 -->
+                            <div class="colorPicker" @click.stop='' value="#B6BD79">自定义颜色</div>
+                        </div>
+                    </div>
+                </div>
+           </div>
+        </div>
+        <div class="toolBox flex">
+            <div class="toolItem flex">
+                <div class="checkboxCicle">
+                    <input type="checkbox" @click.stop='toggleBg' id="checkboxInput" name="" v-model='isShowFg'/>
+                    <label for="checkboxInput"></label>
+                </div>
+                <div class='toggleBg'>呈现方格</div>
+            </div>
+            <div class="toolItem " v-for='(i,index) in bannerConfig'>
+                <div class="flexY" @click='toggleMore(index)'>
+                    <div class="pic"></div>
+                    <div class="txt">{{i.title}}</div>
+                </div>
+                <div class="more" v-show='i.isShowMore' :style="{width:i.width,top:i.top}">
+                    <template v-if='imgConfig&&imgConfig[i.title]'>
+                        <div :class='{graphBox:true ,flexY:true ,active:activeGraph(item.txt)}'
+                            v-for='item in imgConfig[i.title]' @click='addPath(item.txt)'>
+                            <img :src="item.imgSrc" class="graph">
+                            <div class="txt">{{item.txt}}</div>
+                        </div>
+                        <!-- 如果是奇数的话填充一个空白项站位 -->
+                        <div class="graphBox" v-if='(imgConfig[i.title].length%2)!==0'></div>
+                    </template>
+                </div>
+            </div>
+            <div class="toolItem">
+                <div class="addPic">选择图片
+                    
+                </div>
+                <input type="file" @change='addImg' class="box-file  add-file" accept="image/*"
+                          title="点击添加图片" name="" value="" placeholder="">
+                <!-- <div class="addtxt"></div> -->
+            </div>
+        </div>
+        
+        <!-- 方便做测试用的 正式代码屏蔽-->
+        <!-- <button @click="addImg">添加图片</button> -->
+        <button @click="clip">剪切图片</button>
+        
+    </div>
+   
+</body>
+<script src="js/lib/jquery.min.js"></script>
+<script src="js/lib/colors.js"></script>
+<script src="js/lib/jqColorPicker.js"></script>
+<script type="text/javascript" src="js/lib/es6-promise.auto.min.js"></script>
+<script type="text/javascript" src="js/lib/axios.min.js"></script>
+<script type="text/javascript" src="js/lib/vue.min.js"></script>
+<script type="text/javascript" src="js/base.js"></script>
+<script src='js/lib/fabric.min.js'></script>
+<script src="js/lib/element.ui.js"></script>
+<script src="js/lib/require.js" data-main="js/app/edit.es5.js"></script>
+
+</html>

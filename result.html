@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>测评数据</title>
+    <link rel="stylesheet" href="./css/base.css">
+    <link rel="stylesheet" href="./css/main.css">
+</head>
+<body>
+    <div class="result-main" id="vm" v-cloak>
+        <div class="top">
+            <div class="tabBox">
+                <span :class="{active:operation=='isDone'}" @click='isDoneTab'>已提交</span><span :class="{active:operation=='notDone'}"  @click='notDoneTab'>未提交</span>
+            </div>
+            <div class="total">
+                参与情况:&nbsp;&nbsp;&nbsp;<span class='hasDone'>1</span><span>/30</span>
+            </div>
+        </div>
+        <div class="contain">
+            <template v-if='operation=="isDone"'>
+                <div class="isDone" v-for='i in isDoneStuArr'>
+                    <div class="txtBox">
+                        <div class="top"></div>
+                        <div class="bottom">{{i}}</div>
+                    </div>
+                </div>
+            </template>  
+            <template v-if='operation=="notDone"'>
+                <div class="notDone" v-for='i in notDoneStuArr'>
+                    <div class="txtBox">
+                        <div class="top">{{i}}</div>
+                        <div class="bottom">未完成</div>
+                    </div>
+                </div>
+            </template>  
+        </div>
+    </div>
+</body>
+
+<script src="js/lib/jquery.min.js"></script>
+<script type="text/javascript" src="js/lib/es6-promise.auto.min.js"></script>
+<script type="text/javascript" src="js/lib/axios.min.js"></script>
+<script type="text/javascript" src="js/lib/vue.min.js"></script>
+<script type="text/javascript" src="js/base.js"></script>
+<script src="js/lib/require.js" data-main="js/app/result.es5.js"></script>
+</html>
