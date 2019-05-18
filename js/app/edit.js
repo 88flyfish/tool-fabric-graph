@@ -121,14 +121,7 @@ $(function () {
                 },
             },
             watch: {
-                //fabric的api太多了，实在找不到简便的api去直接监控选择的元素变化了，暂时监听操作的元素路径变化来隐藏颜色拾取器功能
-                // 'operation.path':{
-                //     handler:function(newVal){
-                //         if(!newVal){this.isShowOperation = false}
-                //         this.isShowColorPick = false
-                //     },
-                //     deep:true
-                // }
+                
             }
         });
     });
@@ -144,8 +137,5 @@ $(function () {
 
 
     fabric.Object.prototype.transparentCorners = false;
-    // for (var n = 0; n < canvas.getObjects().length; n++) {
-    //     // canvas.item(n).hasControls = canvas.item(n).hasBorders = false;
-    // }
 
 });

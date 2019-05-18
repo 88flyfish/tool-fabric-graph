@@ -26,6 +26,13 @@ define(['graphPathConfig'],function (graphPathConfig) {
                             _this.canvas.renderAll();
                         };
                     },
+                    'mouse:move':function(options){
+                        if(options.transform){
+                            graphPathConfig.move(options.e)
+                            console.log(options,graphPathConfig.move(options.e)) 
+                            _this.canvas.renderAll();
+                        }
+                    },
                     'mouse:up': function (options) {
                         var select = _this.canvas.getActiveObject()
                         if(select){
@@ -46,13 +53,6 @@ define(['graphPathConfig'],function (graphPathConfig) {
                             _this.isShowOperation = false;
                             _this.isShowColorPick = false
                         }
-                        //这里有点讨巧的是根据 背景网格的颜色来判断 
-                        if (options.target&&options.target.stroke!==_this.canvasBgLineColor) {
-                            //获取操作工具的位置
-                            
-                        }else{
-                           
-                        };
                     },
                     'object:moved': function (e) {
                         e.target.set({
@@ -119,50 +119,12 @@ define(['graphPathConfig'],function (graphPathConfig) {
                 });
             },
             clone(){
-                // let canvas = this.canvas;
                 var _this = this;
                 this.canvas.getActiveObject().clone(function(cloned){
-                     // let _clipboard = cloned;
                      _this.paste(cloned);
                  })
             },
-            // copy(){
-            //     const _this = this
-            //     if (!this.operation) return
-            //     if(this.operation._element && this.operation._element.className === 'canvas-img') {
-            //         fabric.Image.fromURL(_this.operation._element.currentSrc, function (img) {
-            //             img.set({
-            //                 top: _this.operation.top + 30,
-            //                 left: _this.operation.left + 30,
-            //                 width:_this.operation.width,
-            //                 height:_this.operation.height
-            //             })
-            //             _this.canvas.add(img);
-            //         })
-            //     }else{
-            //         let pathStr = '',options={};
-            //         this.operation.path.forEach(item=>{
-            //             item.forEach(i=>{
-            //                 pathStr =pathStr + ' '+ i
-            //             })
-            //         })
-            //         options = {
-            //             fill : this.operation.fill,
-            //             strokeWidth : this.operation.strokeWidth,
-            //             stroke : this.operation.stroke,
-            //             angle : this.operation.angle,
-            //             opacity : this.operation.opacity,
-            //             left : this.operation.left + 20,
-            //             top : this.operation.top + 20
-            //         }
-            //         const path = new fabric.Path(pathStr)
-            //         path.set(options)
-            //         this.canvas.add(path)
-            //         this.canvas.renderAll();
-            //     }
-            // },
             rotate() {
-                console.log(this.operation,11)
                 if (!this.operation) return
                 if (this.operation.angle === 360) {
                     this.operation.angle = 0
@@ -204,7 +166,6 @@ define(['graphPathConfig'],function (graphPathConfig) {
                 e.stopPropagation();
                 var img = e.target
                 var oFile = e.target.files[0]
-                console.log(oFile,87)
                 var fr = new FileReader();
                 var rFilter = /^(?:image\/bmp|image\/cis\-cod|image\/gif|image\/ief|image\/jpeg|image\/jpeg|image\/jpeg|image\/pipeg|image\/png|image\/svg\+xml|image\/tiff|image\/x\-cmu\-raster|image\/x\-cmx|image\/x\-icon|image\/x\-portable\-anymap|image\/x\-portable\-bitmap|image\/x\-portable\-graymap|image\/x\-portable\-pixmap|image\/x\-rgb|image\/x\-xbitmap|image\/x\-xpixmap|image\/x\-xwindowdump)$/i;
                 if (!rFilter.test(oFile.type)) {
@@ -295,46 +256,22 @@ define(['graphPathConfig'],function (graphPathConfig) {
                     options.startAngle = 90;
                     this.canvas.add(new fabric['Circle'](options));
                 }else if(type === '正方体'){
-                    let options1 = {
+                    let options = {
                         fill: color ? color : '#75BAFF',
                         strokeWidth: 2,
                         stroke: 'rgba(0,0,0,1)',
                         angle: angle ? angle : 0,
-                        opacity: 0.6
+                        opacity: 0.6,
                     };
                     var tmp = []
                     var list = JSON.parse(this.graphPathConfig[type])
-                    console.log(list)
                     list.forEach((item,index)=>{
-                        switch(index){
-                            case 0:
-                               options.fill = '#ff3322'
-                               break;
-                            case 1:
-                               options.fill = 'green'
-                               options.left = 100
-                               options.top = 50
-                               break;
-                            case 2:
-                               options.fill = 'yellow'
-                               break;
-                            case 3:
-                               options.fill = 'blue'
-                               break;
-                            case 4:
-                               options.fill = 'pink'
-                               break;
-                            case 5:
-                               options.fill = 'black'
-                               break;
-                        }
-                        // options.fill = '#ff3322'
-                        var path = new fabric.Path(item,options1);
+                        var path = new fabric.Path(item,options);
                         tmp.push(path)
-                        var group = new fabric.Group(tmp)
-                        group.set(options)
-                        this.canvas.add(group)
                     })
+                    var group = new fabric.Group(tmp)
+                    group.set(options)
+                    this.canvas.add(group)
                 }else {
                     //判断传过来的数据类型
                     if(!(this.graphPathConfig[type] instanceof Array)){
@@ -342,20 +279,6 @@ define(['graphPathConfig'],function (graphPathConfig) {
                         path.set(options)
                         this.canvas.add(path)
                     }
-                    // else{
-                    //     var tmp = []
-                    //     this.graphPathConfig[type].forEach((item,index)=>{
-                    //         console.log(this.graphPathConfig[type])
-                    //         var path
-                    //         if(index==0){
-                    //             path = new fabric.Path(this.graphPathConfig[type][index]);
-                    //             tmp.push(path)
-                    //         }
-                    //         var group = new fabric.Group(tmp)
-                    //         group.set(options)
-                    //         this.canvas.add(group)
-                    //     })
-                    // }
                 }
             },
             drawGrid(step) {
