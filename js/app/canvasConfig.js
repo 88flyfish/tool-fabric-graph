@@ -1,4 +1,132 @@
 define(['graphPathConfig'],function (graphPathConfig) {
+     /************绘制正方体************/ 
+     var Vertex = function(x, y, z) {
+        this.x = parseFloat(x);
+        this.y = parseFloat(y);
+        this.z = parseFloat(z);
+    };
+    
+    var Vertex2D = function(x, y) {
+        this.x = parseFloat(x);
+        this.y = parseFloat(y);
+    };
+    
+    var Cube = function(center, side) {
+        // Generate the vertices
+        var d = side / 2;
+        this.vertices = [
+            new Vertex(center.x - d, center.y - d, center.z + d),
+            new Vertex(center.x - d, center.y - d, center.z - d),
+            new Vertex(center.x + d, center.y - d, center.z - d),
+            new Vertex(center.x + d, center.y - d, center.z + d),
+            new Vertex(center.x + d, center.y + d, center.z + d),
+            new Vertex(center.x + d, center.y + d, center.z - d),
+            new Vertex(center.x - d, center.y + d, center.z - d),
+            new Vertex(center.x - d, center.y + d, center.z + d)
+        ];
+    
+        // Generate the faces
+        this.faces = [
+            [this.vertices[0], this.vertices[1], this.vertices[2], this.vertices[3]],
+            [this.vertices[3], this.vertices[2], this.vertices[5], this.vertices[4]],
+            [this.vertices[4], this.vertices[5], this.vertices[6], this.vertices[7]],
+            [this.vertices[7], this.vertices[6], this.vertices[1], this.vertices[0]],
+            [this.vertices[7], this.vertices[0], this.vertices[3], this.vertices[4]],
+            [this.vertices[1], this.vertices[6], this.vertices[5], this.vertices[2]]
+        ];
+    };
+    
+    function project(M) {
+        return new Vertex2D(M.x, M.z);
+    }
+    
+    function render(objects, dx, dy) {
+        let pathStrArr = []
+        for (var i = 0, n_obj = objects.length; i < n_obj; ++i) {
+            // For each face
+            for (var j = 0, n_faces = objects[i].faces.length; j < n_faces; ++j) {
+                let pathStr = ''
+                var face = objects[i].faces[j];
+                // Draw the first vertex
+                var P = project(face[0]);
+                pathStr += `M ${P.x + dx} ${-P.y + dy}`      
+                for (var k = 1, n_vertices = face.length; k < n_vertices; ++k) {
+                    P = project(face[k]);
+                    if(k===n_vertices-1){
+                        pathStr += ` L ${P.x + dx} ${-P.y + dy} z`
+                    }else{
+                        pathStr += ` L ${P.x + dx} ${-P.y + dy}`
+                    }
+                }
+                pathStrArr.push(pathStr)
+            }
+        }
+        return pathStrArr
+    }
+    var dx = 300 , dy = 200, cube_bianchang = 120 //cube_bianchang边长
+    var cube_center = new Vertex(0, 11 * dy / 10, 0);
+    var cube = new Cube(cube_center, cube_bianchang); 
+    var objects = [cube];
+
+    var list
+                
+    var mousedown = false;
+    var mx = 0;
+    var my = 0;
+    // document.getElementById('canvas').addEventListener('mousedown', initMove);
+    // document.addEventListener('mousemove', move);
+    // document.addEventListener('mouseup', stopMove);
+    // Rotate a vertice
+    //防抖
+    function debounce(method, delay) {
+        var timer = null;
+        return function () {
+            var self = this,
+                args = arguments;
+            timer && clearTimeout(timer);
+            timer = setTimeout(function () {
+                method.apply(self, args);
+            }, delay);
+        }
+    }
+    function rotate(M, center, theta, phi) {
+        var ct = Math.cos(theta);
+        var st = Math.sin(theta);
+        var cp = Math.cos(phi);
+        var sp = Math.sin(phi);
+        // Rotation
+        var x = M.x - center.x;
+        var y = M.y - center.y;
+        var z = M.z - center.z;
+
+        M.x = ct * x - st * cp * y + st * sp * z + center.x;
+        M.y = st * x + ct * cp * y - ct * sp * z + center.y;
+        M.z = sp * y + cp * z + center.z;
+    }
+
+    // Initialize the movement
+    function initMove(evt) {
+        mousedown = true;
+        mx = evt.clientX;
+        my = evt.clientY;
+    }
+
+    function move(evt) {
+        if (mousedown) {
+            var theta = (evt.clientX - mx) * Math.PI / 360;
+            var phi = (evt.clientY - my) * Math.PI / 180;
+            console.log(evt,mx,my)
+            for (var i = 0; i < 8; ++i){
+                rotate(cube.vertices[i], cube_center, theta, phi);
+            }
+            mx = evt.clientX;
+            my = evt.clientY;
+            list = render(objects, dx, dy);
+            // return render(objects, dx, dy);
+        }
+    }
+               
+   /************绘制正方体************/ 
     return {
         methods: {
             init() {
@@ -11,12 +139,9 @@ define(['graphPathConfig'],function (graphPathConfig) {
                 // this.canvas.rotationCursor = "pointer",//改变旋转时鼠标样式
                 this.canvas.defaultCursor = 'move';
                 this.canvas.hoverCursor = 'pointer';
-                $(window).on('resize', function () {
-                    this.canvas.setHeight($(window).height());
-                    this.canvas.setWidth($(window).width());
-                });
                 this.canvas.on({
                     'mouse:down': function (options) {
+                        initMove(options.e)
                         _this.isShowColorPick = false
                         graphPathConfig.initMove(options.e)
                         if (options.target&&options.target.stroke!==_this.canvasBgLineColor) {
@@ -27,11 +152,7 @@ define(['graphPathConfig'],function (graphPathConfig) {
                         };
                     },
                     'mouse:move':function(options){
-                        if(options.transform){
-                            graphPathConfig.move(options.e)
-                            console.log(options,graphPathConfig.move(options.e)) 
-                            _this.canvas.renderAll();
-                        }
+                        
                     },
                     'mouse:up': function (options) {
                         var select = _this.canvas.getActiveObject()
@@ -64,6 +185,15 @@ define(['graphPathConfig'],function (graphPathConfig) {
                     },
                     'object:modified': function(e) {
                        _this.isShowOperation = false
+                    },
+                    'object:rotating':function(options){
+                        if(options.transform&&options.target.graphName==='正方体'){
+                            move(options.e)
+                            //删除上一次生成的图形
+                             _this.canvas.remove(_this.lastItem);
+                             debounce(_this.addPath('正方体'),200) 
+                            _this.canvas.renderAll();
+                        }
                     },
                     'object:scaling':function(e){
                         
@@ -262,15 +392,24 @@ define(['graphPathConfig'],function (graphPathConfig) {
                         stroke: 'rgba(0,0,0,1)',
                         angle: angle ? angle : 0,
                         opacity: 0.6,
+                        graphName:'正方体' //自定义属性
                     };
                     var tmp = []
-                    var list = JSON.parse(this.graphPathConfig[type])
+                    // var list = JSON.parse(this.graphPathConfig[type])
+                     list = render(objects, dx, dy)
+                    //初次渲染变化倾斜角
+                    if(!this.lastItem){
+                        initMove({clientX:536,clientY:118})
+                        move({clientX:516,clientY:160})
+                    }
                     list.forEach((item,index)=>{
                         var path = new fabric.Path(item,options);
                         tmp.push(path)
                     })
                     var group = new fabric.Group(tmp)
                     group.set(options)
+                    
+                    this.lastItem = group
                     this.canvas.add(group)
                 }else {
                     //判断传过来的数据类型

@@ -26,6 +26,7 @@ $(function () {
                 canvas: null,
                 canvasWidth: 800,
                 canvasHeight: 400,
+                lastItem: null,
                 canvasBgLineColor: '#ddd',
                 isShowFg: '1',
                 isShowOperation: false,
