@@ -69,14 +69,9 @@ define(['graphPathConfig'],function (graphPathConfig) {
     var objects = [cube];
 
     var list
-                
     var mousedown = false;
     var mx = 0;
     var my = 0;
-    // document.getElementById('canvas').addEventListener('mousedown', initMove);
-    // document.addEventListener('mousemove', move);
-    // document.addEventListener('mouseup', stopMove);
-    // Rotate a vertice
     //防抖
     function debounce(method, delay) {
         var timer = null;
@@ -115,25 +110,215 @@ define(['graphPathConfig'],function (graphPathConfig) {
         if (mousedown) {
             var theta = (evt.clientX - mx) * Math.PI / 360;
             var phi = (evt.clientY - my) * Math.PI / 180;
-            console.log(evt,mx,my)
             for (var i = 0; i < 8; ++i){
                 rotate(cube.vertices[i], cube_center, theta, phi);
             }
             mx = evt.clientX;
             my = evt.clientY;
             list = render(objects, dx, dy);
-            // return render(objects, dx, dy);
         }
     }
-               
    /************绘制正方体************/ 
+   /************绘制球体************/ 
+   //    var canvas = document.getElementById("cas"),
+   //    ctx = canvas.getContext("2d"),
+   var $vm,
+   vpx =300,
+   vpy =200,
+   Radius = 150,                       //整体大球的坐标
+   LayerBallNum = 360 / 15,        // 横向
+   LayerIntervalUp = 360 / 15;     //
+   balls = [],
+   circles = [],
+   angleX = Math.PI/100,
+   angleY = Math.PI/100;
+
+   window.addEventListener("mousemove" , function(event){
+       var x = event.clientX  -200- vpx;
+       var y = event.clientY  -150- vpy;
+
+       angleY = -x*0.0001;
+       angleX = -y*0.0001;
+   });
+
+   var Animation = function(){
+    //    this.init();
+   };
+
+   Animation.prototype = {
+       isrunning: false,
+       init: function () {
+           var num = LayerIntervalUp / 2;    
+           for (var i = 0; i <=num; i++) {
+               var l = new layer(i, 1);
+               l.draw();
+               var l = new layer(i, -1);
+               l.draw();
+           }
+       },
+       start:function(){
+           this.isrunning = true;
+           animate();
+       },
+       stop:function(){
+           this.isrunning = false;
+       }
+   }
+
+   function animate(){
+    //    ctx.clearRect(0,0,canvas.width , canvas.height);
+       rotateX();
+       rotateY();
+       rotateZ();
+       for(var i=0;i<balls.length;i++){
+           balls[i].paint();
+       }
+       if(animation.isrunning) {
+           if("requestAnimationFrame" in window){
+               requestAnimationFrame(animate);
+           }
+           else if("webkitRequestAnimationFrame" in window){
+               webkitRequestAnimationFrame(animate);
+           }
+           else if("msRequestAnimationFrame" in window){
+               msRequestAnimationFrame(animate);
+           }
+           else if("mozRequestAnimationFrame" in window){
+               mozRequestAnimationFrame(animate);
+           }
+       }
+   }
+
+
+   var layer = function (num, up) {
+       this.radius = Math.sqrt(Math.pow(Radius,2) - Math.pow(Radius * Math.cos(num * Math.PI * 2 / LayerBallNum), 2))
+       this.x = 0;
+       this.y = 0;
+       this.up = up;
+   }
+
+   layer.prototype = {
+       setBalls: function (radius) {
+           for(var i=0; i<LayerBallNum; i++){
+               var angle =  2 * Math.PI / LayerBallNum * i;
+               var b = new ball(radius * Math.cos(angle), radius * Math.sin(angle), this.up * Math.sqrt(Math.pow(Radius, 2) - Math.pow(radius, 2)), 1.5);
+               var circle = b.paint();
+               balls.push(b);
+               circles.push(circle)
+           }
+       },
+       draw: function () {
+            //    ctx.beginPath();
+            //    ctx.arc(vpx, vpy, this.radius , 0, 2*Math.PI, true);
+            //    ctx.strokeStyle = "#00F";
+            //    ctx.stroke();
+            let options = {
+                fill: '#75BAFF',
+                strokeWidth: 2,
+                stroke: 'rgba(255,0,0,1)',
+                angle:  0,
+                opacity: 0.6,
+                // originX : 'center',
+                // originY : 'center',
+            };
+            console.log($vm,912)
+            // $vm.canvas.add(new fabric['Circle'](options));
+            this.setBalls(this.radius);
+            var group = new fabric.Group(circles)
+            group.set(options)
+            console.log(circles,16)
+            if(circles.length === 624){
+                $vm.canvas.add(group)
+            }
+       }
+   }
+
+   var ball = function(x , y , z , r){
+       this.x = x;
+       this.y = y;
+       this.z = z;
+       this.r = r;
+       this.width = 3*r;
+   }
+
+   ball.prototype = {
+       paint:function(ctx){
+           const _this = this;
+           var fl = 450 //焦距
+        //    ctx.save();
+        //    ctx.beginPath();
+           var scale = fl / (fl - this.z);
+           var alpha = (this.z+Radius)/(2*Radius);
+        //    ctx.arc(vpx + this.x, vpy + this.y, this.r*scale , 0 , 2*Math.PI , true);
+        //    ctx.fillStyle = "rgba(3,255,255,"+(alpha+0.5)+")";
+        //    ctx.fill();
+        //    ctx.restore();
+            let options = {
+                radius: _this.r*scale,
+                // fill: 'red',
+                // originX: 'center', 
+                // originY: 'center',
+                opacity: alpha+0.5
+            }
+           var circle = new fabric['Circle'](options);
+           return circle
+           //   console.log($vm.canvas)
+        //    $vm.canvas.add(circle)
+       }
+   }
+
+   function rotateX(){
+       var cos = Math.cos(angleX);
+       var sin = Math.sin(angleX);
+       for(var i=0;i<balls.length;i++){
+           var y1 = balls[i].y * cos - balls[i].z * sin;
+           var z1 = balls[i].z * cos + balls[i].y * sin;
+           balls[i].y = y1;
+           balls[i].z = z1;
+       }
+   }
+
+   function rotateY(){
+       var cos = Math.cos(angleY);
+       var sin = Math.sin(angleY);
+       for(var i=0;i<balls.length;i++){
+           var x1 = balls[i].x * cos - balls[i].z * sin;
+           var z1 = balls[i].z * cos + balls[i].x * sin;
+           balls[i].x = x1;
+           balls[i].z = z1;
+       }
+   }
+
+   function rotateZ(){
+       var cos = Math.cos(angleY);
+       var sin = Math.sin(angleY);
+       for(var i=0;i<balls.length;i++){
+           var x1 = balls[i].x * cos - balls[i].y * sin;
+           var y1 = balls[i].y * cos + balls[i].x * sin;
+           balls[i].x = x1;
+           balls[i].y = y1;
+       }
+   }
+
+   var animation = new Animation();
+    //    animation.start();
+    //    document.getElementById("controlBtn").onclick = function(){
+    //        this.innerText === "开始" ? this.innerText="停止" : this.innerText="开始";
+    //        this.innerText === "开始" ? animation.stop() : animation.start();;
+    //    }
+   /************绘制球体************/ 
     return {
         methods: {
             init() {
                 const _this = this;
+                $vm = this;
                 this.canvas = new fabric.Canvas('canvas');
                 this.canvas.setHeight(this.canvasHeight);
                 this.canvas.setWidth(this.canvasWidth);
+
+                animation.init()
+                vpx = this.canvasWidth/2,
+                vpy = this.canvasHeight/2,
                 // canvas.selections=false//取消框选
                 // canvas.selection = false;
                 // this.canvas.rotationCursor = "pointer",//改变旋转时鼠标样式
@@ -143,7 +328,7 @@ define(['graphPathConfig'],function (graphPathConfig) {
                     'mouse:down': function (options) {
                         initMove(options.e)
                         _this.isShowColorPick = false
-                        graphPathConfig.initMove(options.e)
+                        // graphPathConfig.initMove(options.e)
                         if (options.target&&options.target.stroke!==_this.canvasBgLineColor) {
                             options.target.set({
                                 opacity: 0.5
@@ -354,14 +539,6 @@ define(['graphPathConfig'],function (graphPathConfig) {
                     callback(base64,w,h);
                 }
             },
-            clip() {
-                const clipPath = new fabric.Path('M 0 0 L 50 50 L 0 50 z');
-                this.operation.set({
-                    'fill': 'yellow'
-                })
-                this.operation.clipPath = clipPath
-                this.canvas.renderAll();
-            },
             addPath(type, color, angle) {
                 let options = {
                     top: this.canvasHeight/2 ,
@@ -373,10 +550,11 @@ define(['graphPathConfig'],function (graphPathConfig) {
                     clipPath: null,
                     opacity: 0.6,
                     originX : 'center',
-                    originY : 'center',
+                    originY : 'center'
                 };
                 if (type === '圆形') {
                     options.radius = 55;
+                    console.log(11,new fabric['Circle'](options))
                     this.canvas.add(new fabric['Circle'](options));
                 }else if(type === '椭圆'){
                     options.radius = 65;
@@ -408,9 +586,10 @@ define(['graphPathConfig'],function (graphPathConfig) {
                     })
                     var group = new fabric.Group(tmp)
                     group.set(options)
-                    
                     this.lastItem = group
                     this.canvas.add(group)
+                }else if(type === '球体'){
+
                 }else {
                     //判断传过来的数据类型
                     if(!(this.graphPathConfig[type] instanceof Array)){
